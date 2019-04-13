@@ -166,11 +166,11 @@ ManifoldContour <- function(file_path,isovalue,verification,color_mesh,opacity,n
 #' Optionally, the original dataset grid is preprocessed (subdivided in specifics points) to eliminate the configuration that
 #' results in non-manifold edges.
 #' @examples
-#' ExportManifoldContour(system.file("extdata", "f3.nhdr", package = "tcie"), 0.0, FALSE, "mesh.ply")
-#' ExportManifoldContour(system.file("extdata", "f3.nhdr", package = "tcie"), 0.0, TRUE, "mesh.ply")
-#' ExportManifoldContour(system.file("extdata", "f9.nhdr", package = "tcie"), 0.0, TRUE, "mesh.ply")
+#' ExpManifoldContour(system.file("extdata", "f3.nhdr", package = "tcie"), 0.0, FALSE, "mesh.ply")
+#' ExpManifoldContour(system.file("extdata", "f3.nhdr", package = "tcie"), 0.0, TRUE, "mesh.ply")
+#' ExpManifoldContour(system.file("extdata", "f9.nhdr", package = "tcie"), 0.0, TRUE, "mesh.ply")
 #' @export
-ExportManifoldContour <- function(file_path,isovalue,verification, export_path)
+ExpManifoldContour <- function(file_path,isovalue,verification, export_path)
 {
 
   if(nat::is.nrrd(file_path) == FALSE){stop("The input file must to be in nrrd format")}
@@ -185,19 +185,25 @@ ExportManifoldContour <- function(file_path,isovalue,verification, export_path)
   sy <-attr(grid_data,"header")$spacings[2]
   sz <-attr(grid_data,"header")$spacings[3]
 
-  cat("Analizing grid...")
-  NewGrid<-AnalizeGrid(grid_data, size_x, size_y, size_z,isovalue)
+  if(verification == TRUE)
+  {
 
-  divide_info <- NewGrid$Sub_info
+    cat("Analizing grid...")
 
-  conty <-NewGrid$conty
-  contz <-NewGrid$contz
+    NewGrid<-AnalizeGrid(grid_data, size_x, size_y, size_z,isovalue)
+
+    divide_info <- NewGrid$Sub_info
+
+    conty <-NewGrid$conty
+    contz <-NewGrid$contz
+
     cat("done!\n")
 
     if((conty + contz)>0)
     {
       cat(conty + contz, "non-manifold edge would be generated. \n")
       cat("Fixing grid...")
+
       if((conty != 0)&&(contz !=0))
       {
         divide_info_y <- divide_info[1:conty,]
@@ -227,11 +233,12 @@ ExportManifoldContour <- function(file_path,isovalue,verification, export_path)
       size_y <- size_y + Sub_grid$Conty
       size_z <- size_z + Sub_grid$Contz
 
+
       cat("done!\n")
     }
     else
       cat("The grid does not need to be fixed. \n")
-
+  }
 
   MC <-ExtendedRunMC(grid_data, isovalue, size_x, size_y, size_z, sx,sy,sz)
 
@@ -299,52 +306,60 @@ Clipping <- function(file_path, isovalue,verification,color_mesh,opacity, new_wi
   size_y <-range_y[2]-range_y[1] + 1
   size_z <-range_z[2]-range_z[1] + 1
 
-  cat("Analizing grid...")
-  NewGrid<-AnalizeGrid(grid_data, size_x, size_y, size_z,isovalue)
-
-  divide_info <- NewGrid$Sub_info
-
-  conty <-NewGrid$conty
-  contz <-NewGrid$contz
-  cat("done!\n")
-
-  if((conty + contz)>0)
+  if(verification == TRUE)
   {
-    cat(conty + contz, "non-manifold edge would be generated. \n")
-    cat("Fixing grid...")
-    if((conty != 0)&&(contz !=0))
-    {
-      divide_info_y <- divide_info[1:conty,]
-      divide_info_z <- divide_info[(conty+1):(conty+contz),]
-    }
-    if(conty == 0)
-    {
-      divide_info_y <- NULL
-      divide_info_z <- divide_info[1:contz,]
-    }
-    if(contz == 0)
-    {
-      divide_info_y <- divide_info[1:conty,]
-      divide_info_z <- NULL
-    }
 
-    if(contz == 1)
-      divide_info_z <-matrix(divide_info_z, nrow = 1, ncol = 2)
+    cat("Analizing grid...")
 
-    if(conty == 1)
-      divide_info_y <-matrix(divide_info_y, nrow = 1, ncol = 2)
+    NewGrid<-AnalizeGrid(grid_data, size_x, size_y, size_z,isovalue)
 
-    Sub_grid<-SubdivideGrid(conty, contz,size_x, size_y, size_z, divide_info_y,divide_info_z,grid_data)
+    divide_info <- NewGrid$Sub_info
 
-    grid_data <- Sub_grid$grid
-
-    size_y <- size_y + Sub_grid$Conty
-    size_z <- size_z + Sub_grid$Contz
+    conty <-NewGrid$conty
+    contz <-NewGrid$contz
 
     cat("done!\n")
+
+    if((conty + contz)>0)
+    {
+      cat(conty + contz, "non-manifold edge would be generated. \n")
+      cat("Fixing grid...")
+
+      if((conty != 0)&&(contz !=0))
+      {
+        divide_info_y <- divide_info[1:conty,]
+        divide_info_z <- divide_info[(conty+1):(conty+contz),]
+      }
+      if(conty == 0)
+      {
+        divide_info_y <- NULL
+        divide_info_z <- divide_info[1:contz,]
+      }
+      if(contz == 0)
+      {
+        divide_info_y <- divide_info[1:conty,]
+        divide_info_z <- NULL
+      }
+
+      if(contz == 1)
+        divide_info_z <-matrix(divide_info_z, nrow = 1, ncol = 2)
+
+      if(conty == 1)
+        divide_info_y <-matrix(divide_info_y, nrow = 1, ncol = 2)
+
+      Sub_grid<-SubdivideGrid(conty, contz,size_x, size_y, size_z, divide_info_y,divide_info_z,grid_data)
+
+      grid_data <- Sub_grid$grid
+
+      size_y <- size_y + Sub_grid$Conty
+      size_z <- size_z + Sub_grid$Contz
+
+
+      cat("done!\n")
+    }
+    else
+      cat("The grid does not need to be fixed. \n")
   }
-  else
-    cat("The grid does not need to be fixed. \n")
 
   MC <-ExtendedRunMC(grid_data, isovalue, size_x, size_y, size_z, sx,sy,sz)
 
@@ -417,20 +432,25 @@ ExpClipping <- function(file_path,isovalue, verification, range_x, range_y, rang
   size_y <-range_y[2]-range_y[1] + 1
   size_z <-range_z[2]-range_z[1] + 1
 
-  cat("Analizing grid...")
+  if(verification == TRUE)
+  {
 
-  NewGrid<-AnalizeGrid(grid_data, size_x, size_y, size_z,isovalue)
+    cat("Analizing grid...")
 
-  divide_info <- NewGrid$Sub_info
+    NewGrid<-AnalizeGrid(grid_data, size_x, size_y, size_z,isovalue)
 
-  conty <-NewGrid$conty
-  contz <-NewGrid$contz
+    divide_info <- NewGrid$Sub_info
+
+    conty <-NewGrid$conty
+    contz <-NewGrid$contz
+
     cat("done!\n")
 
     if((conty + contz)>0)
     {
       cat(conty + contz, "non-manifold edge would be generated. \n")
       cat("Fixing grid...")
+
       if((conty != 0)&&(contz !=0))
       {
         divide_info_y <- divide_info[1:conty,]
@@ -460,10 +480,12 @@ ExpClipping <- function(file_path,isovalue, verification, range_x, range_y, rang
       size_y <- size_y + Sub_grid$Conty
       size_z <- size_z + Sub_grid$Contz
 
+
       cat("done!\n")
     }
     else
       cat("The grid does not need to be fixed. \n")
+  }
 
   MC <-ExtendedRunMC(grid_data, isovalue, size_x, size_y, size_z, sx,sy,sz)
 
@@ -485,7 +507,124 @@ ExpClipping <- function(file_path,isovalue, verification, range_x, range_y, rang
 
 #============================================================================================
 #============================================================================================
+# A utility function to find the subset of an element i
+find_<-function(parent,i)
+{
+  if (parent[i] == -1) return (i)
+  else(find_(parent, parent[i]))
+}
 
+# A utility function to do union of two subsets
+union_<-function(parent, x, y)
+{
+  xset <- find_(parent, x)
+  yset <- find_(parent, y)
+  parent[xset] <- yset
+
+  return(parent)
+}
+#' Returns the  Betti numbers of a given mesh.
+#'
+#' @param file_path A string: the path to a triangular mesh file in the ply format
+#' @description
+#' This function returns the Betti numbers b0, b1 and b2, which represents the number of connected components,
+#' the number of independent tunnelsand the number of closed regions in space, respectively.
+#' The function implementation followsthe algorithms described by Konkle, Moran, Hamann, and Joy in the work
+#' Fast Methods for Computing Isosur-face Topology with Betti Numbers.
+#' @examples
+#' BettiNumbers(system.file("extdata", "m3.ply", package = "tcie"))
+#' @export
+BettiNumbers<-function(file_path)
+{
+  mesh <- geomorph::read.ply(file_path,ShowSpecimen=F, addNormals = FALSE)
+
+  n_v<- Rvcg::nverts(mesh)
+  n_f<- Rvcg::nfaces(mesh)
+  edges <-Rvcg::vcgGetEdge(mesh, unique = TRUE)
+
+  parent <- rep(-1, n_v)
+
+  b0 <- n_v
+
+  n_e_b <- 0
+  board_verts <-c()
+
+  for(t in 1: n_f)
+  {
+    v <- mesh$it[,t]
+
+    cont_face_neighbor <- 0
+    for(i in 1:3)
+    {
+      j <- i + 1
+      if(i == 3) j <- 1
+
+      x <- find_(parent, v[i])
+      y <- find_(parent, v[j])
+
+      if(x != y)
+      {
+        b0 <-b0 -1
+        parent <- union_(parent, x, y)
+      }
+
+      v1 <- v[i]
+      v2 <- v[j]
+
+      cont_edge_neighbor <-0
+
+      for(l in 1:3)
+      {
+        faces_v1 <- which(mesh$it[l,] == v1)
+        l_v1_v2  <- which(mesh$it[,faces_v1] == v2)
+
+        if((length(faces_v1)!=0)&&(length(l_v1_v2)!=0))
+        {
+          for(i in 1:length(l_v1_v2))
+          {
+            id_neighbor<- ceiling(l_v1_v2[i]/3)
+            if(faces_v1[id_neighbor] != t)
+            {
+              cont_face_neighbor <- cont_face_neighbor + 1
+              cont_edge_neighbor <- 1
+            }
+          }
+        }
+      }
+
+      if(cont_edge_neighbor == 0) board_verts <- c(board_verts, v1)
+
+      if((i == 3)&&(cont_face_neighbor == 0)) n_e_b<- n_e_b + 3
+      if((i == 3)&&(cont_face_neighbor == 1)) n_e_b<- n_e_b + 2
+      if((i == 3)&&(cont_face_neighbor == 2)) n_e_b<- n_e_b + 1
+    }
+  }
+
+  n_b <- 0
+  n_b_verts <- length(board_verts)
+  parent_board_vert <- c()
+
+  if(n_b_verts == 1)  n_b <- 1
+  if(n_b_verts > 1)
+  {
+    for(i in 1: n_b_verts)
+    {
+      options(expressions = 100000)
+      parent_board_vert[i]<-find_(parent, board_verts[i])
+    }
+
+    n_b <-length(unique(parent_board_vert))
+  }
+  n_e <- length(edges[,1])
+  e_c <- n_v - n_e + n_f
+
+  b2 <- b0 - n_b
+  b1 <- b0 + b2 - e_c
+
+  return(c(b0, b1, b2))
+}
+#============================================================================================
+#============================================================================================
 SubdivideGrid<-function(conty, contz, size_x, size_y, size_z, subdivide_info_y, subdivide_info_z,f)
 {
 
