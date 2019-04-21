@@ -1,8 +1,8 @@
 Package: tcie
 Type: Package
 Title: Topologically Correct Isosurface Extraction
-Version: 0.2
-Date: 2019-04-10
+Version: 0.3
+Date: 2019-04-19
 Author: Lis Custódio
 Maintainer: Lis Custodio <liscustodio.uerj@gmail.com>
 URL: http://liscustodio.github.io/
@@ -16,6 +16,8 @@ RoxygenNote: 6.1.1
 License: GPL
 Encoding: UTF-8
 NeedsCompilation: yes
-Packaged: 2019-04-11 22:22:21 UTC; lis
+Packaged: 2019-04-20 01:26:55 UTC; lis
+X-CRAN-Archive: Archived on 2019-04-21 as update had exactly the same
+        check problems as before.
 Repository: CRAN
-Date/Publication: 2019-04-13 23:02:41 UTC
+Date/Publication: 2019-04-21 15:10:03 UTC

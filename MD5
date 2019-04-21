@@ -1,4 +1,4 @@
-c436ea462a34daa769e42558e863f63e *DESCRIPTION
+a81bfad2b65c842729f201fe4a06ce3c *DESCRIPTION
 d8d8270f87096b050ae48011fbaef90e *NAMESPACE
 8b4834d8c8db59b2b768753ffbd4079b *R/RcppExports.R
 b2ce5523ad421a0b5fb706830dd9af02 *R/main.R
@@ -15,7 +15,7 @@ e613e1b7d3f0fb386e8ab6ec1f75ffee *man/Clipping.Rd
 79fe5d5bb5ec37082d402ea082668ff3 *man/ExpClipping.Rd
 e8c63c5df0d3ee3b6ac62c8da4293fc0 *man/ExpManifoldContour.Rd
 44229aa7c94cf231664a3d89f72bbf8f *man/ManifoldContour.Rd
-b2f911a3f43d28447249a9f0668e74b6 *src/ExtendedMC.cpp
+5efce7b329e97c8615de38b744fa3c30 *src/ExtendedMC.cpp
 c9bc2a6fb86f326aed53fed57f667c35 *src/Makevars
 0e276b85223939e9303d9b6f1b50b680 *src/RcppExports.cpp
 4cff75b73b0201277f5e3682c0c44af5 *src/chull.cpp

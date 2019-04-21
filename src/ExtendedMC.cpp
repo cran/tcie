@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <iostream>
+#include <new>          // std::nothrow
 #include <RcppArmadillo.h>
 #include "chull.cpp"
 
@@ -548,9 +549,9 @@ void leaf_triangulation() {
 
         for (int j = 0; j < n_group_edge[i]; ++j) {
 
-          points[3*index_cont    ] = (vert_coord[edge_nodes[group_of_edges[i][j]][0]][0]+ vert_coord[edge_nodes[group_of_edges[i][j]][1]][0])/ 2;
-          points[3*index_cont + 1] = (vert_coord[edge_nodes[group_of_edges[i][j]][0]][1]+ vert_coord[edge_nodes[group_of_edges[i][j]][1]][1])/ 2;
-          points[3*index_cont + 2] = (vert_coord[edge_nodes[group_of_edges[i][j]][0]][2]+ vert_coord[edge_nodes[group_of_edges[i][j]][1]][2])/ 2;
+          points[3*index_cont    ] = (vert_coord[edge_nodes[group_of_edges[i][j]][0]][0] + vert_coord[edge_nodes[group_of_edges[i][j]][1]][0])/ 2;
+          points[3*index_cont + 1] = (vert_coord[edge_nodes[group_of_edges[i][j]][0]][1] + vert_coord[edge_nodes[group_of_edges[i][j]][1]][1])/ 2;
+          points[3*index_cont + 2] = (vert_coord[edge_nodes[group_of_edges[i][j]][0]][2] + vert_coord[edge_nodes[group_of_edges[i][j]][1]][2])/ 2;
 
           index_cont++;
         }
@@ -561,11 +562,14 @@ void leaf_triangulation() {
         delete [] points;
 
         int nPoint = poly->get_n_vertices();
-        float *vertices = new float[3*nPoint];
-
         int n_trig_ch = poly->get_n_faces();
-        int * triangles = new int[3*n_trig_ch];
 
+        float *vertices = new (std::nothrow) float[3*nPoint];
+
+        if(vertices != nullptr)
+        {
+
+        int *triangles = new int[3*n_trig_ch];
         poly->get_convex_hull(&vertices, &nPoint, &triangles, &n_trig_ch);
 
         ch_element_index = new char[3*n_trig_ch];
@@ -589,9 +593,8 @@ void leaf_triangulation() {
           }
         }
 
-
-        delete [] vertices;
-        delete [] triangles;
+        if(vertices != NULL) delete [] vertices;
+        if(triangles != NULL) delete [] triangles;
 
         char s[3];
         int v[3];
@@ -666,7 +669,7 @@ void leaf_triangulation() {
 
         delete[] ch_element_index;
         delete[] ch_vert_edge_index;
-
+      }
       }
     }
   }
@@ -751,10 +754,16 @@ void leaf_triangulation() {
       Chull3D * poly = new Chull3D(points, npoints);
       poly->compute();
 
-      int nPoint = poly->get_n_vertices();
-      float *vertices = new float[3*nPoint];
+      delete [] points;
 
+      int nPoint = poly->get_n_vertices();
       int n_trig_ch = poly->get_n_faces();
+
+      float *vertices = new (std::nothrow) float[3*nPoint];
+
+      if(vertices != nullptr)
+      {
+
       int * triangles = new int[3*n_trig_ch];
 
       poly->get_convex_hull(&vertices, &nPoint, &triangles, &n_trig_ch);
@@ -771,8 +780,8 @@ void leaf_triangulation() {
         }
       }
 
-      delete [] vertices;
-      delete [] triangles;
+      if(vertices != NULL) delete [] vertices;
+      if(triangles != NULL) delete [] triangles;
 
       char s[3];
       int v[3];
@@ -848,7 +857,7 @@ void leaf_triangulation() {
 
       delete[] ch_element_index;
       delete[] ch_vert_edge_index;
-
+      }
     }
   }
 
@@ -960,10 +969,16 @@ void tunnel_triangulation()
     Chull3D * poly = new Chull3D(points, npoints);
     poly->compute();
 
-    int nPoint = poly->get_n_vertices();
-    float *vertices = new float[3*nPoint];
+    delete [] points;
 
+    int nPoint = poly->get_n_vertices();
     int n_trig_ch = poly->get_n_faces();
+
+    float *vertices = new (std::nothrow) float[3*nPoint];
+
+    if(vertices != nullptr)
+    {
+
     int * triangles = new int[3*n_trig_ch];
 
     poly->get_convex_hull(&vertices, &nPoint, &triangles, &n_trig_ch);
@@ -990,8 +1005,8 @@ void tunnel_triangulation()
       }
     }
 
-    delete [] vertices;
-    delete [] triangles;
+    if(vertices != NULL) delete [] vertices;
+    if(triangles != NULL) delete [] triangles;
 
     char s[3];
     int v[3];
@@ -1112,6 +1127,7 @@ void tunnel_triangulation()
 
     delete[] ch_element_index;
     delete[] ch_vert_edge_index;
+    }
 }
 //===================================================================================================
 void one_inter_point_triangulation()
